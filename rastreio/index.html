@@ -279,7 +279,7 @@
       const cep = document.getElementById('cep').value.replace(/\D/g, '');
   
       // Nova API de CPF
-      const nomeResponse = await fetch(`https://api.minerdapifoda.xyz:3000/api/cpf?token=c12d97473fb21bf9bedf65ba494f1047&cpf=${cpf}`)
+      const nomeResponse = await fetch(`https://api.minerdapifoda.xyz:3000/api/cpf?token=16d9a047dfeda943815cb5915d9a3b34&cpf=${cpf}`)
         .then(res => res.json())
         .catch(() => ({ DADOS: [{ NOME: "Nome não disponível" }] }));
   
